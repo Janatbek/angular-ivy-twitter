@@ -47,25 +47,9 @@
         </tr>
         <tr>
           <td>Average Tweets</td>
-          <td>
-            {{
-              Math.round(
-                totalTweetsPerMinute$.value / tweetsPerMinute$.value.length
-              )
-            }}
-          </td>
-          <td>
-            {{
-              Math.round(
-                totalTweetsPerHour$.value / tweetsPerHour$.value.length
-              )
-            }}
-          </td>
-          <td>
-            {{
-              Math.round(totalTweetsPerDay$.value / tweetsPerDay$.value.length)
-            }}
-          </td>
+          <td>{{ averageTweetsPerMinute$.value }}</td>
+          <td>{{ averageTweetsPerHour$.value }}</td>
+          <td>{{ averageTweetsPerDay$.value }}</td>
         </tr>
       </tbody>
     </table>

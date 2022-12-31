@@ -26,6 +26,18 @@ export class AppComponent {
   );
   totalTweetsPerHour$: BehaviorSubject<number> = new BehaviorSubject<number>(0);
   totalTweetsPerDay$: BehaviorSubject<number> = new BehaviorSubject<number>(0);
+
+  averageTweetsPerMinute$: BehaviorSubject<number> =
+    new BehaviorSubject<number>(0);
+  // Math.round(
+  //   totalTweetsPerMinute$.value / tweetsPerMinute$.value.length
+  // )
+  averageTweetsPerHour$: BehaviorSubject<number> = new BehaviorSubject<number>(
+    0
+  );
+  averageTweetsPerDay$: BehaviorSubject<number> = new BehaviorSubject<number>(
+    0
+  );
   Math = Math;
   constructor(private tweetsService: TweetsService) {}
 
@@ -37,24 +49,42 @@ export class AppComponent {
       this.tweetsService.tweetsPerDay$,
     ]).subscribe(
       ([tweetPerMinuteResult, tweetPerHourResult, tweetPerDayResult]) => {
-        this.tweetsPerMinute$.next(tweetPerMinuteResult.data);
-        this.tweetsPerHour$.next(tweetPerHourResult.data);
-        this.tweetsPerDay$.next(tweetPerDayResult.data);
-        if (tweetPerMinuteResult.meta?.total_tweet_count) {
-          this.totalTweetsPerMinute$.next(
-            tweetPerMinuteResult.meta?.total_tweet_count
-          );
-        }
-        if (tweetPerHourResult.meta?.total_tweet_count) {
-          this.totalTweetsPerHour$.next(
-            tweetPerHourResult.meta?.total_tweet_count
-          );
-        }
-        if (tweetPerDayResult.meta?.total_tweet_count) {
-          this.totalTweetsPerDay$.next(
-            tweetPerDayResult.meta?.total_tweet_count
-          );
-        }
+        const perMinute = tweetPerMinuteResult.data.filter(
+          (t) => +t.tweet_count > 0
+        );
+        const perHour = tweetPerHourResult.data.filter(
+          (t) => +t.tweet_count > 0
+        );
+        const perDay = tweetPerDayResult.data.filter((t) => +t.tweet_count > 0);
+
+        const perMinuteTotal = perMinute.reduce(
+          (acc, curr) => (acc += +curr.tweet_count),
+          0
+        );
+        const perHourTotal = perHour.reduce(
+          (acc, curr) => (acc += +curr.tweet_count),
+          0
+        );
+        const perDayTotal = perDay.reduce(
+          (acc, curr) => (acc += +curr.tweet_count),
+          0
+        );
+        // tweets result
+        this.tweetsPerMinute$.next(perMinute);
+        this.tweetsPerHour$.next(perHour);
+        this.tweetsPerDay$.next(perDay);
+        // Total tweets
+        this.totalTweetsPerMinute$.next(perMinuteTotal);
+        this.totalTweetsPerHour$.next(perHourTotal);
+        this.totalTweetsPerDay$.next(perDayTotal);
+        // average
+        this.averageTweetsPerMinute$.next(
+          Math.round(perMinuteTotal / perMinute.length)
+        );
+        this.averageTweetsPerHour$.next(
+          Math.round(perHourTotal / perHour.length)
+        );
+        this.averageTweetsPerDay$.next(Math.round(perDayTotal / perDay.length));
       }
     );
   }
@@ -64,6 +94,17 @@ export class AppComponent {
     if (hashtag.length < 1) {
       return;
     }
+    this.tweetsPerMinute$.next([]);
+    this.tweetsPerHour$.next([]);
+    this.tweetsPerDay$.next([]);
+
+    this.totalTweetsPerMinute$.next(0);
+    this.totalTweetsPerHour$.next(0);
+    this.totalTweetsPerDay$.next(0);
+
+    this.averageTweetsPerMinute$.next(0);
+    this.averageTweetsPerHour$.next(0);
+    this.averageTweetsPerDay$.next(0);
 
     this.tweetsService.params.next(hashtag);
   }
