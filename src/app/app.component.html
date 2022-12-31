@@ -1,4 +1,74 @@
-<hello name="{{ name }}"></hello>
-<p>
-  Start editing to see some magic happen :)
-</p>
+<div class="container">
+  <div class="row mt-3">
+    <div class="col-md-3 input-group">
+      <label for="hashtag" class="form-label me-3">Hashtag:</label>
+      <input
+        id="hashtag"
+        [formControl]="hashtag"
+        type="text"
+        class="form-control"
+        placeholder="enter hashtag: #tsla"
+        aria-label=""
+        aria-describedby="button-addon2"
+        (click)="searchByHashtag()"
+      />
+      <button
+        type="button"
+        (click)="searchByHashtag()"
+        class="btn btn-sm btn-primary"
+      >
+        Submit
+      </button>
+    </div>
+  </div>
+</div>
+
+<div
+  class="card"
+  *ngIf="tweetsPerMinute$.value && tweetsPerMinute$.value.length > 0"
+>
+  <div class="card-header">#{{ hashtag.value | uppercase }} Statistics</div>
+  <div class="card-body">
+    <table class="table-responsive table-bordered">
+      <thead>
+        <tr>
+          <th></th>
+          <th>Minute</th>
+          <th>Hour</th>
+          <th>Day</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Total Tweets</td>
+          <td>{{ totalTweetsPerMinute$.value }}</td>
+          <td>{{ totalTweetsPerHour$.value }}</td>
+          <td>{{ totalTweetsPerDay$.value }}</td>
+        </tr>
+        <tr>
+          <td>Average Tweets</td>
+          <td>
+            {{
+              Math.round(
+                totalTweetsPerMinute$.value / tweetsPerMinute$.value.length
+              )
+            }}
+          </td>
+          <td>
+            {{
+              Math.round(
+                totalTweetsPerHour$.value / tweetsPerHour$.value.length
+              )
+            }}
+          </td>
+          <td>
+            {{
+              Math.round(totalTweetsPerDay$.value / tweetsPerDay$.value.length)
+            }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="card-footer"></div>
+</div>
